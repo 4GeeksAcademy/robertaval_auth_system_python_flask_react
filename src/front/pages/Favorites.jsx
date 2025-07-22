@@ -4,16 +4,9 @@ import { useNavigate } from "react-router-dom";
 export const Favorites = () => {
     const [favorites, setFavorites] = useState([]);
     const [newItem, setNewItem] = useState("");
-    const [toastMsg, setToastMsg] = useState("");
-    const [toastType, setToastType] = useState("success");
+    const [toast, setToast] = useState({ message: "", type: "" });
     const navigate = useNavigate();
     const token = sessionStorage.getItem("token");
-
-    const showToast = (msg, type = "success") => {
-        setToastMsg(msg);
-        setToastType(type);
-        setTimeout(() => setToastMsg(""), 3000);
-    };
 
     const fetchFavorites = async () => {
         try {
@@ -23,7 +16,10 @@ export const Favorites = () => {
                 }
             });
 
-            if (res.status === 401) return navigate("/login");
+            if (res.status === 401) {
+                navigate("/login");
+                return;
+            }
 
             const data = await res.json();
             setFavorites(Array.isArray(data) ? data : data.favorites || []);
@@ -46,7 +42,10 @@ export const Favorites = () => {
                 body: JSON.stringify({ item_name: newItem })
             });
 
-            if (res.status === 401) return navigate("/login");
+            if (res.status === 401) {
+                navigate("/login");
+                return;
+            }
 
             if (res.ok) {
                 setNewItem("");
@@ -58,6 +57,7 @@ export const Favorites = () => {
             }
         } catch (err) {
             console.error("Failed to add favorite:", err);
+            showToast("Something went wrong while adding favorite.", "error");
         }
     };
 
@@ -65,60 +65,78 @@ export const Favorites = () => {
         try {
             const res = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/favorites/${id}`, {
                 method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
 
             if (res.ok) {
-                showToast("🗑️ Favorite deleted", "success");
                 fetchFavorites();
+                showToast("🗑️ Favorite deleted successfully!", "success");
             }
         } catch (err) {
             console.error("Failed to delete favorite:", err);
+            showToast("Error deleting favorite.", "error");
         }
     };
 
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast({ message: "", type: "" }), 3000);
+    };
+
     useEffect(() => {
-        if (!token) navigate("/login");
-        else fetchFavorites();
+        if (!token) {
+            navigate("/login");
+        } else {
+            fetchFavorites();
+        }
     }, []);
 
     return (
-        <div className="container favorites-container">
+        <div className="container">
             <h2>Favorites</h2>
 
-            {toastMsg && (
-                <div className={`toast-msg ${toastType === "error" ? "error" : "success"}`}>
-                    {toastMsg}
+            {/* Toast Message */}
+            {toast.message && (
+                <div className={`toast-msg ${toast.type}`}>
+                    {toast.message}
                 </div>
             )}
 
+            {/* Input & Add Button */}
             <div className="favorites-form">
                 <input
                     type="text"
                     value={newItem}
                     onChange={(e) => setNewItem(e.target.value)}
-                    className="favorites-input"
+                    className="form-control"
                     placeholder="Add a favorite item"
                 />
-                <button className="btn btn-success" onClick={addFavorite}>Add</button>
+                <button className="btn btn-success" onClick={addFavorite}>
+                    Add
+                </button>
             </div>
 
-            <div className="favorites-list">
-                {favorites.length > 0 ? (
-                    favorites.map((fav) => (
-                        <div key={fav.id} className="favorite-item">
-                            <span>{fav.item_name}</span>
-                            <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() => deleteFavorite(fav.id)}
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <div className="no-favorites">No favorites yet.</div>
-                )}
+            {/* Favorites List */}
+            <div className="favorites-box">
+                <ul className="list-group">
+                    {favorites.length > 0 ? (
+                        favorites.map((fav) => (
+                            <li key={fav.id} className="list-group-item">
+                                <span>{fav.item_name}</span>
+                                <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => deleteFavorite(fav.id)}
+                                >
+                                    Remove
+                                </button>
+                            </li>
+                        ))
+                    ) : (
+                        <li className="list-group-item text-muted">No favorites yet.</li>
+                    )}
+                </ul>
             </div>
         </div>
     );
