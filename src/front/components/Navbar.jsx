@@ -16,11 +16,15 @@ export const Navbar = () => {
                 <div className="ms-auto d-flex gap-2">
                     {!token ? (
                         <>
-                            <Link to="/login" className="btn btn-outline-primary">Login</Link>
-                            <Link to="/signup" className="btn btn-primary">Signup</Link>
+                            <Link to="/login" className="btn btn-outline-primary">Log In</Link>
+                            <Link to="/signup" className="btn btn-primary">Sign Up</Link>
                         </>
                     ) : (
-                        <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+                        <>
+                            <Link to="/private" className="btn btn-outline-primary">Home</Link>
+                            <Link to="/favorites" className="btn btn-outline-secondary">Favorites</Link>
+                            <button onClick={handleLogout} className="btn btn-danger">Log Out</button>
+                        </>
                     )}
                 </div>
             </div>

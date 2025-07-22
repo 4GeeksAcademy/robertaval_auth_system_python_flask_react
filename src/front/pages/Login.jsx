@@ -17,7 +17,7 @@ export const Login = () => {
             const res = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // important if cookies ever used
+                credentials: "include", 
                 body: JSON.stringify(form)
             });
 
@@ -29,17 +29,17 @@ export const Login = () => {
                 dispatch({ type: "set_user", payload: data.user });
                 navigate("/private");
             } else {
-                setError(data.msg || "Login failed.");
+                setError(data.msg || "Log in failed.");
             }
         } catch (err) {
             console.error("Login error:", err);
-            setError("An error occurred during login.");
+            setError("An error occurred during log in.");
         }
     };
 
     return (
         <div className="container mt-5" style={{ maxWidth: "400px" }}>
-            <h2 className="mb-4 text-center">Login</h2>
+            <h2 className="mb-4 text-center">Log In</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleLogin}>
                 <div className="mb-3">
@@ -62,7 +62,7 @@ export const Login = () => {
                         required
                     />
                 </div>
-                <button type="submit" className="btn btn-primary w-100">Login</button>
+                <button type="submit" className="btn btn-primary w-100">Log In</button>
             </form>
         </div>
     );

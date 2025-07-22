@@ -9,7 +9,7 @@ export const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); // Clear any previous error
+        setError(null);
 
         try {
             const res = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/signup", {
@@ -17,27 +17,27 @@ export const Signup = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                credentials: "include", // ✅ CORS requires this if cookies or auth headers are used
+                credentials: "include", 
                 body: JSON.stringify(form)
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                alert("Signup successful! Redirecting to login...");
+                alert("Signup successful! You may now log in.");
                 navigate("/login");
             } else {
-                setError(data.msg || "Signup failed.");
+                setError(data.msg || "Sign up failed.");
             }
         } catch (error) {
-            console.error("Signup error:", error);
+            console.error("Sign up error:", error);
             setError("A network error occurred.");
         }
     };
 
     return (
         <div className="container mt-5" style={{ maxWidth: "400px" }}>
-            <h2 className="mb-4 text-center">Signup</h2>
+            <h2 className="mb-4 text-center">Sign Up</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
@@ -60,7 +60,7 @@ export const Signup = () => {
                         onChange={e => setForm({ ...form, password: e.target.value })}
                     />
                 </div>
-                <button type="submit" className="btn btn-success w-100">Signup</button>
+                <button type="submit" className="btn btn-success w-100">Sign Up</button>
             </form>
         </div>
     );
